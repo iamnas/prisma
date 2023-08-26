@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id   String @id @default(uuid())
+  name String
+  age  Int
+
+  email String @unique
+  role  Role   @default(BASIC)
+  // isAdmin     Boolean
+  // preferences Json?
+
+  writtenPost  Post[] @relation("Writtenpostes")
+  favoritePost Post[] @relation("FavoritePosts")
+
+  userPreference   UserPreference? @relation(fields: [userPreferenceId], references: [id])
+  userPreferenceId String?         @unique
+
+  @@unique([age, name]) // this means that same name and same age can't be inserted in the database
+  @@index([email])
+}
+
+model UserPreference {
+  id           String  @id @default(uuid())
+  emailUpdates Boolean
+  user         User?
+
+}
+
+model Post {
+  id            String   @id @default(uuid())
+  title         String
+  averageRating Float
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  author        User     @relation("Writtenpostes", fields: [authorId], references: [id])
+  authorId      String
+
+  favoriteBy User?   @relation("FavoritePosts", fields: [favoriteId], references: [id])
+  favoriteId String?
+
+  categories Category[]
+
+  // @@id([title,authorId])  //candidates key 
+}
+
+model Category {
+  id    String @id @default(uuid())
+  name  String @unique
+  posts Post[]
+}
+
+enum Role {
+  BASIC
+  ADMIN
+}
