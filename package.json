@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "devStart": "nodemon script.ts"
+    "start": "nodemon script.ts",
+     "seed": "ts-node prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
